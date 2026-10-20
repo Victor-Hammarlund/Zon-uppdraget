@@ -1,0 +1,13 @@
+- **DMZ**  // Medel T - Risk: DDOS, service går ned och vanliga användare når inte tjänster.
+
+  
+- **Applikationszon** // Hög R- Risk: Manipulerad affärslogik kan ge felaktiga resultat och påverka dataflöden.
+
+ 
+- **Datazon**  - Hög K - Risk: läckta användar uppgifter
+  
+
+- **Drift- och förvaltningszon** - Hög R & T- Risk:  Hot aktör kan skada loggar och, potentiellt orsaka skada mot Jump-servern så att klientzonen inte kan nås av personal.
+
+
+- **Klientzon** - Hög  K - Risk: Stulna konton, användardata eller sessioner.
