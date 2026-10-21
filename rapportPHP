@@ -21,8 +21,4 @@ Informationen är i nuläget svag. Den bygger på en enda läckt uppgift, och wa
 Rekommenderade åtgärder
 Bevaka PHP:s officiella säkerhetskanaler inför tillkännagivandet den 22 oktober.
 Ta fram en inventering över alla servrar och applikationer som kör PHP i produktion, inklusive PHP-baserade CMS och interna verktyg.
-Agera inte på ej verifierade uppgifter, men håll uppdateringsprocessen redo.
-Installera den fixade versionen så snart den släpps, och prioritera system som är nåbara från internet.
-Slutsats
 
-Hotet är potentiellt allvarligt med tanke på PHP:s utbredning, men det är ännu obekräftat. De närmaste dagarna avgör vad som faktiskt gäller. Den 22 oktober bör rapporten följas upp mot PHP:s egen säkerhetsinformation.
