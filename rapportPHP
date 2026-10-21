@@ -1,0 +1,30 @@
+Rapport: Rapporterade PHP-sårbarheter CVE-2026-109618 och CVE-2026-109619
+
+Källa: watchTowr Intel, FAQ publicerad 20 oktober 2026. Status per 21 oktober 2026.
+
+Sammanfattning
+
+watchTowr har publicerat en FAQ om två rapporterade sårbarheter för fjärrkörning av kod (Remote Code Execution, RCE) i skriptspråket PHP. Sårbarheterna har identifierats som CVE-2026-109618 och CVE-2026-109619. Informationen är inte bekräftad av PHP-projektet, och det finns varken någon officiell säkerhetsrapport eller någon patch. Det som finns är en läcka och förberedelser inför ett väntat tillkännagivande.
+
+Bakgrund
+
+Uppgifterna kom fram genom ett inlägg på sociala medier. Där hävdades att PHP skulle publicera ett säkerhetsmeddelande om två RCE-sårbarheter den 22 oktober 2026 kl. 18:00 CEST. Den som läckte uppgifterna angav själv att påståendet bara vilade på förtroende för källan och inte var oberoende verifierat. watchTowr har därefter satt samman en FAQ som uppdateras när nya detaljer dyker upp.
+
+Vad som är känt
+
+Enligt den ej verifierade rapporten skulle en angripare kunna köra egen kod på en server som kör PHP och därmed i värsta fall ta kontroll över den. Båda sårbarheterna uppges påverka alla PHP-versioner från PHP 5 och framåt. Varken den tekniska orsaken, eventuella krav på konfiguration eller vilka funktioner som berörs har beskrivits. Ingen fixad version finns, och ingen skyldig aktör har pekats ut. Inga attacker har rapporterats, och sårbarheterna finns inte i CISA:s katalog över kända utnyttjade sårbarheter (KEV). Allvarlighetsgraden är ännu inte fastställd. FAQ:n anger CVSS 0.0, vilket här betyder “ej bedömd” och inte “ofarlig”.
+
+Bedömning och källkritik
+
+Informationen är i nuläget svag. Den bygger på en enda läckt uppgift, och watchTowr understryker själva att inget är bekräftat. Sidan innehåller dessutom detaljer som tyder på att den skrevs snabbt. Versionstabellen listar “5, 6, 7 8”, och PHP 6 släpptes aldrig i skarp version. Rubrikens mening om att “CVE-2026-109618 är sårbarheter” är också en slarvig formulering. Slutsatsen är att man bör förbereda sig men inte dra några säkra slutsatser om omfattning eller påverkan före det officiella meddelandet.
+
+Rekommenderade åtgärder
+Bevaka PHP:s officiella säkerhetskanaler inför tillkännagivandet den 22 oktober.
+Ta fram en inventering över alla servrar och applikationer som kör PHP i produktion, inklusive PHP-baserade CMS och interna verktyg.
+Agera inte på ej verifierade uppgifter, men håll uppdateringsprocessen redo.
+Installera den fixade versionen så snart den släpps, och prioritera system som är nåbara från internet.
+Slutsats
+
+Hotet är potentiellt allvarligt med tanke på PHP:s utbredning, men det är ännu obekräftat. De närmaste dagarna avgör vad som faktiskt gäller. Den 22 oktober bör rapporten följas upp mot PHP:s egen säkerhetsinformation.
+
+Vill du ha rapporten som Word- eller PDF-fil, eller kortad till en sida?
