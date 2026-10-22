@@ -1,13 +1,13 @@
-| # | Källa | Riktning | Destination | Protokoll / Port | Åtgärd | Kommentar |
-|---|-------|:--------:|-------------|------------------|--------|-----------|
-| 1 | Klientzon (10.40.50.0/24) | → | Webbserver (10.40.10.10) | HTTPS, TCP 443 | ✅ Tillåt | Användare når webbtjänsten |
-| 2 | Klientzon (10.40.50.0/24) | → | Jump-server (10.40.40.10) | SSH TCP 22 / RDP TCP 3389 | ✅ Tillåt | Endast behöriga administratörer |
-| 3 | Klientzon (10.40.50.0/24) | ⛔ | Applikationsserver (10.40.20.10) | Alla | ❌ Blockera | Ingen direktåtkomst |
-| 4 | Klientzon (10.40.50.0/24) | ⛔ | Kunddatabas (10.40.30.10) | Alla | ❌ Blockera | Ingen direktåtkomst |
-| 5 | Webbserver (10.40.10.10) | → | Applikationsserver (10.40.20.10) | Godkänd applikationsport | ✅ Tillåt | Endast nödvändig applikationstrafik |
-| 6 | Applikationsserver (10.40.20.10) | → | Kunddatabas (10.40.30.10) | Databasport | ✅ Tillåt | Enda tillåtna källan till databasen |
-| 7 | Jump-server (10.40.40.10) | → | Hanterade servrar | SSH TCP 22 / RDP TCP 3389 | ✅ Tillåt | Endast nödvändiga portar |
-| 8 | Hanterade servrar | → | Loggserver (10.40.40.20) | Loggtrafik (t.ex. syslog 514) | ✅ Tillåt | Central loggning |
-| 9 | Alla | ⛔ | Alla | Alla | ❌ Blockera | Standardregel: allt som inte uttryckligen tillåts nekas |
+| # | Källa | Riktning | Destination | Port | Åtgärd | Filtreras var | Motivering |
+|---|-------|:--------:|-------------|------|--------|---------------|------------|
+| 1 | Klientzon | → | Webbserver | TCP 443 (HTTPS) | ✅ Tillåt | Brandvägg, klientzon | Användarna behöver använda webbtjänsten |
+| 2 | Klientzon | → | Jump-server | TCP 22 / 3389 | ✅ Tillåt | Brandvägg, klientzon | Admins behöver logga in för att förvalta servrarna |
+| 3 | Klientzon | ⛔ | Applikationsserver | Alla | ❌ Blockera | Brandvägg, klientzon | Inget behov, klienter går via webbservern |
+| 4 | Klientzon | ⛔ | Kunddatabas | Alla | ❌ Blockera | Brandvägg, klientzon | Inget behov, data hämtas via applikationen |
+| 5 | Webbserver | → | Applikationsserver | Applikationsport | ✅ Tillåt | Brandvägg, DMZ | Webbservern skickar användarnas förfrågningar till applikationen |
+| 6 | Applikationsserver | → | Kunddatabas | Databasport | ✅ Tillåt | Brandvägg, applikationszon | Applikationen behöver läsa och spara kunddata |
+| 7 | Jump-server | → | Hanterade servrar | TCP 22 / 3389 | ✅ Tillåt | Brandvägg, driftzon | Servrarna behöver uppdateras och underhållas |
+| 8 | Hanterade servrar | → | Loggserver | Syslog 514 | ✅ Tillåt | Brandvägg, källzon | Händelser måste loggas för felsökning och incidentutredning |
+| 9 | Alla | ⛔ | Alla | Alla | ❌ Blockera | Brandvägg, alla zoner | Inget behov, all övrig trafik nekas |
 
-**Teckenförklaring:** → = trafik initieras från källa till destination (svarstrafik tillåts tillbaka, stateful brandvägg) · ⛔ = trafik blockeras
+**→** = tillåten riktning (svar tillåts tillbaka) · **⛔** = blockeras
