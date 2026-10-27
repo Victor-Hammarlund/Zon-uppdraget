@@ -2,7 +2,7 @@
 
 **Uppdragsgivarens adressutrymme:** `10.40.7.0/24`
 
-### DMZ
+### Klient
 - Subnät: `10.40.7.0/26`
 - Gateway: `10.40.7.1`
 - Webbserver: `10.40.7.10`
@@ -23,7 +23,7 @@
 - Jump-server: `10.40.7.82`
 - Loggserver: `10.40.7.83`
 
-### Klientzon
+### DMZ
 - Subnät: `10.40.7.88/29`
 - Gateway: `10.40.7.1`
 - Klientdatorer: `10.40.7.90–10.40.7.94`
