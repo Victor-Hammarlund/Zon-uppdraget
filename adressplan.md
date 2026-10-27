@@ -5,7 +5,7 @@
 ### Klient
 - Subnät: `10.40.7.0/26`
 - Gateway: `10.40.7.1`
-- Klientdatorer: `10.40.7.90–10.40.7.94`
+- Klientdatorer: `10.40.7.10–10.40.7.62`
 
 ### Applikationszon
 - Subnät: `10.40.7.64/29`
@@ -26,5 +26,4 @@
 ### DMZ
 - Subnät: `10.40.7.88/29`
 - Gateway: `10.40.7.1`
-
-- Webbserver: `10.40.7.10`
+- Webbserver: `10.40.7.90`
