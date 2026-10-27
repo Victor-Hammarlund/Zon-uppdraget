@@ -1,29 +1,29 @@
 ## Adressplan
 
-**Uppdragsgivarens adressutrymme:** `10.40.0.0/16`
+**Uppdragsgivarens adressutrymme:** `10.40.7.0/24`
 
 ### DMZ
-- Subnät: `10.40.10.0/24`
-- Gateway: `10.40.10.1`
-- Webbserver: `10.40.10.10`
+- Subnät: `10.40.7.0/26`
+- Gateway: `10.40.7.1`
+- Webbserver: `10.40.7.10`
 
 ### Applikationszon
-- Subnät: `10.40.20.0/24`
-- Gateway: `10.40.20.1`
-- Applikationsserver: `10.40.20.10`
+- Subnät: `10.40.7.64/29`
+- Gateway: `10.40.7.1`
+- Applikationsserver: `10.40.7.66`
 
 ### Datazon
-- Subnät: `10.40.30.0/24`
-- Gateway: `10.40.30.1`
-- Kunddatabas: `10.40.30.10`
+- Subnät: `10.40.7.72/29`
+- Gateway: `10.40.7.1`
+- Kunddatabas: `10.40.7.74`
 
 ### Drift- och förvaltningszon
-- Subnät: `10.40.40.0/24`
-- Gateway: `10.40.40.1`
-- Jump-server: `10.40.40.10`
-- Loggserver: `10.40.40.20`
+- Subnät: `10.40.7.80/29`
+- Gateway: `10.40.7.1`
+- Jump-server: `10.40.7.82`
+- Loggserver: `10.40.7.83`
 
 ### Klientzon
-- Subnät: `10.40.50.0/24`
-- Gateway: `10.40.50.1`
-- Klientdatorer: `10.40.50.10–10.40.50.254`
+- Subnät: `10.40.7.88/29`
+- Gateway: `10.40.7.1`
+- Klientdatorer: `10.40.7.90–10.40.7.94`
