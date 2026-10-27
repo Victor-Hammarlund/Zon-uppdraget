@@ -1,0 +1,40 @@
+# Adressplan – team 7
+
+Uppdragsgivarens adressutrymme: **10.40.0.0/16** (privat enligt RFC 1918 §3, ur 10/8).
+Teamets tilldelade nät i labbet: **10.40.7.0/24** (team 7).
+**IPv4 endast – IPv6 avstängt på labbservrarna.**
+
+## Teamets nät i Hetzner
+
+- Nät: **itsx26-team-7, 10.40.7.0/24** – skapat av elev-40 2026-10-26 med `moln nät skapa 10.40.7.0/24`
+- Gateway: **10.40.7.1** – nätets första adress, gemensam för alla subnät (Hetzner FAQ)
+- I varje subnät är nätadressen och broadcastadressen reserverade
+- Kontroll: `moln status` på jump ska visa samma nät, subnät och adresser som tabellen nedan
+
+## Subnät och servrar
+
+| Zon | Subnät | Användbara | Reserverade | Server | Adress (eth2) |
+|---|---|---|---|---|---|
+| Klientzon | 10.40.7.0/26 | .2–.62 | .0, .1 (gateway), .63 | Klientdatorer | bara på papper |
+| DMZ | 10.40.7.64/29 | .65–.70 | .64, .71 | Webbserver (elev-40) | **10.40.7.66** |
+| Applikationszon | 10.40.7.72/29 | .73–.78 | .72, .79 | Applikationsserver (elev-42) | **10.40.7.74** |
+| Datazon | 10.40.7.80/29 | .81–.86 | .80, .87 | Kunddatabas (elev-19) | **10.40.7.82** |
+| Loggning | 10.40.7.88/29 | .89–.94 | .88, .95 | Loggserver | bara på papper – kursens log 172.20.1.58 används |
+| Drift- och förvaltningszon | 10.40.7.96/29 | .97–.102 | .96, .103 | Jump/admin (elev-28) | **10.40.7.98** |
+| Reserverat för tillväxt | 10.40.7.104–10.40.7.255 | – | – | – | – |
+
+## Varför så här
+
+- Ett subnät per zon → regler kan sättas mellan zonerna (t.ex. webb får inte nå databasen direkt)
+- Klientzonen /26: 30 klienter idag + 25 % tillväxt ryms
+- Serverzonerna /29: en server per zon med plats för tillväxt
+- Inga krockar med labbnätet 172.20.1.0/24 eller Hetzners gateway 172.31.1.1
+- Alla subnät ryms i teamets /24 och kan beskrivas med 10.40.7.0/24 utåt (RFC 4632)
+
+## Andra nät servrarna sitter på
+
+| Nätkort | Nät | Filtreras av |
+|---|---|---|
+| eth0 | Publik adress (internet) | Molnbrandväggen + nftables |
+| eth1 | Labbnätet 172.20.1.0/24 (jump, log, ctf) | Bara nftables |
+| eth2 | Teamnätet 10.40.7.0/24 | Bara nftables |
