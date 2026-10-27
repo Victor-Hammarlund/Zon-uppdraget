@@ -1,0 +1,59 @@
+# Flödestabell – team 7
+
+Bygger på [adressplanen](adressplan.md): teamets nät 10.40.7.0/24, gateway 10.40.7.1.
+Allt som inte står här nekas – **default deny i båda riktningarna**. Svar på en tillåten anslutning släpps som etablerad trafik (`ct state established,related`) och behöver ingen egen rad.
+
+**Lager:** molnbrandväggen ser bara eth0 (internet). Trafik i labbnätet (eth1) och teamnätet (eth2) filtreras **bara på värden** med nftables.
+
+## Servrar
+
+| Roll | Server | Adress (eth2) |
+|---|---|---|
+| Webb | elev-40 | 10.40.7.66 |
+| App | elev-42 | 10.40.7.74 |
+| Databas | elev-19 | 10.40.7.82 |
+| Admin/jump | elev-28 | 10.40.7.98 |
+
+## Verksamhetsflöden (F)
+
+| Id | Källa | Mål | Protokoll/port | Riktning | Motivering (verksamhetsfunktion) | Lager | Regel ligger på |
+|---|---|---|---|---|---|---|---|
+| F1 | Internet | Webb 10.40.7.66 (publik adress) | tcp/443 | in | Kunderna besöker webbplatsen | Moln + värd | webb: in |
+| F2 | Internet | Webb 10.40.7.66 (publik adress) | tcp/80 | in | Omdirigering till https | Moln + värd | webb: in |
+| F3 | Webb 10.40.7.66 | App 10.40.7.74 | tcp/8080 | in/ut | Portalen hämtar orderdata från appen för att visa kundens ordrar | Värd | webb: ut · app: in |
+| F4 | App 10.40.7.74 | Databas 10.40.7.82 | tcp/3306 | in/ut | Appen läser och sparar kunduppgifter – enda källan som når databasen | Värd | app: ut · databas: in |
+| F5 | Admin 10.40.7.98 | Webb, app, databas (.66, .74, .82) | tcp/22 | in/ut | Drift och underhåll sker bara via adminservern | Värd | admin: ut · övriga: in |
+
+## Driftflöden (D) – på alla fyra servrar
+
+| Id | Riktning | Källa → mål | Protokoll/port | Varför | Lager |
+|---|---|---|---|---|---|
+| D1 | in | jump 172.20.1.2 → min server | tcp/22 | Administration via kursens jump | Värd |
+| D2 | in | ctf 172.20.1.10 → min server | tcp/22 | Kursens kontrolltjänst (CTF) | Värd |
+| D3 | ut | min server → 185.12.64.1, 185.12.64.2 | udp/53, tcp/53 | Namnuppslag (Hetzners resolvrar) | Värd (molnet släpper alltid) |
+| D4 | ut | min server → internet | udp/123 | Tidssynk så att loggarna går att jämföra | Moln + värd |
+| D5 | ut | min server → log 172.20.1.58 | tcp/514 | Brandväggsloggen till loggservern (TLS 6514 i vecka 5) | Värd |
+| D6 | ut | min server → DHCP (172.31.1.1, 172.20.0.1, 10.40.7.1) | udp 68 → 67 | Förnyelse av serverns adresser | Värd (molnet släpper alltid) |
+| D7 | ut | min server → internet | tcp/443 | Säkerhetsuppdateringar med dnf | Moln + värd |
+
+## Uttryckligen nekat (testas på torsdag)
+
+| Id | Källa | Mål | Protokoll/port | Varför nekat |
+|---|---|---|---|---|
+| N1 | Webb 10.40.7.66 | Databas 10.40.7.82 | tcp/3306 | Webben får aldrig nå kunddata direkt – bara via appen |
+| N2 | Labbnätet (andra elever) | Valfri teamserver | tcp/22 | SSH bara från jump, ctf och adminservern |
+| N3 | Valfri server | Internet | annat än D3, D4, D7 | Stoppar exfiltrering och reverse shell |
+
+## Fem rader att ta först (workshop 1)
+
+1. **D1** – SSH från jump (så att ingen låser ute sig)
+2. **F1** – från internet (övar molnlagret)
+3. **F4** – inne i teamnätet (bara värden)
+4. **D5** – utgående (övar kedjan ut)
+5. **F3** – den vi är mest osäkra på
+
+## Att bestämma i teamet
+
+- Databasen: **MySQL tcp/3306** (som i tillgångsförteckningen). Byt till 5432 om ni kör PostgreSQL.
+- Appens port: **8080** är ett antagande – byt om appen lyssnar på annan port.
+- Ska F2 (http/80) finnas, eller bara https/443?
