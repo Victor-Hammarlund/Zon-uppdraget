@@ -1,40 +1,59 @@
 # Adressplan – team 7
 
-Uppdragsgivarens adressutrymme: **10.40.0.0/16** (privat enligt RFC 1918 §3, ur 10/8).
-Teamets tilldelade nät i labbet: **10.40.7.0/24** (team 7).
-**IPv4 endast – IPv6 avstängt på labbservrarna.**
+## Nät
 
-## Teamets nät i Hetzner
+| Fält | Värde |
+|---|---|
+| Teamnät | 10.40.7.0/24 |
+| Namn i Hetzner | itsx26-team-7 |
+| Gateway | 10.40.7.1 (samma för alla subnät) |
+| IP-version | Endast IPv4 |
 
-- Nät: **itsx26-team-7, 10.40.7.0/24** – skapat av elev-40 2026-10-26 med `moln nät skapa 10.40.7.0/24`
-- Gateway: **10.40.7.1** – nätets första adress, gemensam för alla subnät (Hetzner FAQ)
-- I varje subnät är nätadressen och broadcastadressen reserverade
-- Kontroll: `moln status` på jump ska visa samma nät, subnät och adresser som tabellen nedan
+## Zoner
 
-## Subnät och servrar
+| Zon | Subnät | Användbara adresser | Server | Person | Adress | Roll |
+|---|---|---|---|---|---|---|
+| Klient | 10.40.7.0/26 | 10.40.7.2 – 10.40.7.62 | elev-28 | Sustler | 10.40.7.10 | Klient som använder webben |
+| Webb | 10.40.7.64/29 | 10.40.7.65 – 10.40.7.70 | elev-40 | Martin | 10.40.7.66 | Webbserver (https 443, http 80) |
+| App | 10.40.7.72/29 | 10.40.7.73 – 10.40.7.78 | elev-42 | Erik | 10.40.7.74 | Applikationsserver (tcp 8080) |
+| Databas | 10.40.7.88/29 | 10.40.7.89 – 10.40.7.94 | elev-19 | Victor | 10.40.7.90 | Databasserver (PostgreSQL tcp 5432) |
 
-| Zon | Subnät | Användbara | Reserverade | Server | Adress (eth2) |
-|---|---|---|---|---|---|
-| Klientzon | 10.40.7.0/26 | .2–.62 | .0, .1 (gateway), .63 | Klientdatorer | bara på papper |
-| DMZ | 10.40.7.64/29 | .65–.70 | .64, .71 | Webbserver (elev-40) | **10.40.7.66** |
-| Applikationszon | 10.40.7.72/29 | .73–.78 | .72, .79 | Applikationsserver (elev-42) | **10.40.7.74** |
-| Datazon | 10.40.7.80/29 | .81–.86 | .80, .87 | Kunddatabas (elev-19) | **10.40.7.82** |
-| Loggning | 10.40.7.88/29 | .89–.94 | .88, .95 | Loggserver | bara på papper – kursens log 172.20.1.58 används |
-| Drift- och förvaltningszon | 10.40.7.96/29 | .97–.102 | .96, .103 | Jump/admin (elev-28) | **10.40.7.98** |
-| Reserverat för tillväxt | 10.40.7.104–10.40.7.255 | – | – | – | – |
+## Reserverade adresser
 
-## Varför så här
+| Adress | Orsak |
+|---|---|
+| 10.40.7.0 | Nätadress för teamnätet |
+| 10.40.7.1 | Gateway (Hetzner) |
+| 10.40.7.255 | Broadcast för teamnätet |
+| Första och sista adressen i varje subnät | Nätadress och broadcast för subnätet |
 
-- Ett subnät per zon → regler kan sättas mellan zonerna (t.ex. webb får inte nå databasen direkt)
-- Klientzonen /26: 30 klienter idag + 25 % tillväxt ryms
-- Serverzonerna /29: en server per zon med plats för tillväxt
-- Inga krockar med labbnätet 172.20.1.0/24 eller Hetzners gateway 172.31.1.1
-- Alla subnät ryms i teamets /24 och kan beskrivas med 10.40.7.0/24 utåt (RFC 4632)
+## Oanvända adresser
 
-## Andra nät servrarna sitter på
+| Område | Kommentar |
+|---|---|
+| 10.40.7.80 – 10.40.7.87 | Inget subnät. Läraren kräver högst fyra subnät. |
+| 10.40.7.96 – 10.40.7.254 | Ledigt för framtida zoner |
 
-| Nätkort | Nät | Filtreras av |
+## Labbnätet (eth1, 172.20.1.0/24)
+
+| Server | Adress | Används till |
 |---|---|---|
-| eth0 | Publik adress (internet) | Molnbrandväggen + nftables |
-| eth1 | Labbnätet 172.20.1.0/24 (jump, log, ctf) | Bara nftables |
-| eth2 | Teamnätet 10.40.7.0/24 | Bara nftables |
+| jump | 172.20.1.2 | SSH till servrarna (D1) |
+| ctf | 172.20.1.10 | Kontroll av CTF-labbar (D2) |
+| log | 172.20.1.58 | Loggserver, tcp 514 (D5) |
+
+## Nätkort på varje server
+
+| Nätkort | Nät | Används till |
+|---|---|---|
+| eth0 | Internet (publik adress) | dnf, NTP, webb från internet |
+| eth1 | Labbnätet 172.20.1.0/24 | SSH från jump, loggar |
+| eth2 | Teamnätet 10.40.7.0/24 | Trafik mellan teamets servrar |
+
+## Beslut
+
+- Teamet använder fyra zoner: klient, webb, app och databas.
+- Databasen använder subnätet 10.40.7.88/29. Subnätet 10.40.7.80/29 skapas inte.
+- Databasen använder PostgreSQL på tcp 5432.
+- Appen använder tcp 8080.
+- Trafik i teamnätet filtreras bara på servern (nftables). Molnbrandväggen ser bara eth0.
