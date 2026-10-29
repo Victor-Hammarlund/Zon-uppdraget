@@ -1,13 +1,46 @@
-| # | Källa | Riktning | Destination | Port | Åtgärd | Filtreras var | Motivering |
-|---|-------|:--------:|-------------|------|--------|---------------|------------|
-| 1 | Klientzon | → | Webbserver | TCP 443 (HTTPS) | ✅ Tillåt | Brandvägg, klientzon | Användarna behöver använda webbtjänsten |
-| 2 | Klientzon | → | Jump-server | TCP 22 / 3389 | ✅ Tillåt | Brandvägg, klientzon | Admins behöver logga in för att förvalta servrarna |
-| 3 | Klientzon | ⛔ | Applikationsserver | Alla | ❌ Blockera | Brandvägg, klientzon | Inget behov, klienter går via webbservern |
-| 4 | Klientzon | ⛔ | Kunddatabas | Alla | ❌ Blockera | Brandvägg, klientzon | Inget behov, data hämtas via applikationen |
-| 5 | Webbserver | → | Applikationsserver | Applikationsport | ✅ Tillåt | Brandvägg, DMZ | Webbservern skickar användarnas förfrågningar till applikationen |
-| 6 | Applikationsserver | → | Kunddatabas | Databasport | ✅ Tillåt | Brandvägg, applikationszon | Applikationen behöver läsa och spara kunddata |
-| 7 | Jump-server | → | Hanterade servrar | TCP 22 / 3389 | ✅ Tillåt | Brandvägg, driftzon | Servrarna behöver uppdateras och underhållas |
-| 8 | Hanterade servrar | → | Loggserver | Syslog 514 | ✅ Tillåt | Brandvägg, källzon | Händelser måste loggas för felsökning och incidentutredning |
-| 9 | Alla | ⛔ | Alla | Alla | ❌ Blockera | Brandvägg, alla zoner | Inget behov, all övrig trafik nekas |
+# Flödestabell – team 7
 
-**→** = tillåten riktning (svar tillåts tillbaka) · **⛔** = blockeras
+Adressplanen för nätet team-7-mössorna (10.40.7.0/24).
+Allt som inte står här nekas av default deny, i både inkommande och utgående riktning.
+
+## Zoner och adresser
+
+| Zon | Subnät | Server | Ansvarig |
+|---|---|---|---|
+| Klient | 10.40.7.0/26 | 10.40.7.2 | Sustler |
+| Webb | 10.40.7.64/29 | 10.40.7.66 | Martin |
+| Databas | 10.40.7.72/29 | 10.40.7.73 | Victor |
+| App | 10.40.7.88/29 | 10.40.7.89 | Erik |
+
+Alla subnät har gateway 10.40.7.1. Trafiken mellan zonerna går genom Hetzners
+virtuella router, som inte filtrerar och som molnbrandväggen inte ser.
+Zonseparationen görs därför med nftables på varje värd.
+
+## F-regler – flöden mellan zoner
+
+Riktningen anges sett från målservern. Varje F-rad blir två nft-regler med samma id:
+**in** på målservern och **ut** på källservern.
+
+| Id | Riktning | Källa | Mål | Proto/port | Beslut | Motivering |
+|---|---|---|---|---|---|---|
+| F1 | in | Klient 10.40.7.0/26 | Webb 10.40.7.64/29 | tcp/443 | tillåt | Användarna når webbtjänsten krypterat |
+| F2 | in | Klient 10.40.7.0/26 | Webb 10.40.7.64/29 | tcp/80 | tillåt | Omdirigering till HTTPS |
+| F3 | in | Webb 10.40.7.64/29 | App 10.40.7.88/29 | tcp/8080 | tillåt | Webbservern anropar applikationen; bara webbzonen behöver nå appen |
+| F4 | in | App 10.40.7.88/29 | Databas 10.40.7.72/29 | tcp/5432 | tillåt | Bara applikationen ska läsa och skriva data; databasen är den känsligaste tillgången |
+
+## D-regler – driftflöden (samma på alla servrar)
+
+| Id | Riktning | Källa | Mål | Proto/port | Beslut | Motivering |
+|---|---|---|---|---|---|---|
+| D1 | in | jump 172.20.1.2 | min server | tcp/22 | tillåt | All inloggning går via jump |
+| D2 | in | ctf 172.20.1.10 | min server | tcp/22 | tillåt | Kursens kontrolltjänst för CTF-labbarna |
+| D3 | ut | min server | 185.12.64.1, 185.12.64.2 | tcp+udp/53 | tillåt | DNS-uppslag |
+| D4 | ut | min server | internet | udp/123 | tillåt | Tidssynk (NTP), krävs för spårbara loggar |
+| D5 | ut | min server | log 172.20.1.58 | tcp/514 | tillåt | Loggar till den gemensamma loggservern |
+| D6 | ut | min server (udp/68) | DHCP (udp/67) | udp | tillåt | DHCP-förnyelse på alla nätkort |
+| D7 | ut | min server | internet | tcp/443 | tillåt | Paketuppdateringar (dnf) |
+| D8 | in | valfri | min server | icmp echo-request, max 5/s | tillåt | Felsökning med ping |
+
+
+
+
