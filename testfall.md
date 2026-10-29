@@ -6,6 +6,6 @@
 | F1-nek  | elev-28   | 10.40.7.66  | 8080 | tcp       | in       | tyst      | tyst     |
 | F2-till | elev-28   | 10.40.7.66  | 80   | tcp       | in       | open      | open     |
 | F2-nek  | elev-28   | 10.40.7.66  | 22   | tcp       | in       | tyst      | tyst     |
-| F3      | elev-28   | 10.40.7.89  | 8080 | tcp       | in       | open      | open     |
-| F3      | elev-28   | 10.40.7.89  | 8432 | tcp       | ut       | open      | open     |
-| F4      | elev-app  | 10.40.7.73  | 5432 | tcp       | in       | open      | open     |
+| F3-till      | elev-28   | 10.40.7.89  | 8080 | tcp       | in       | open      | open     |
+| F3-till      | elev-28   | 10.40.7.89  | 8432 | tcp       | ut       | open      | open     |
+| F4-till      | elev-28  | 10.40.7.73  | 5432 | tcp       | in       | open      | open     |
